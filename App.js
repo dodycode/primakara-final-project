@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { BottomNavigation, Appbar, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import QueuedReports from './src/screens/QueuedReports';
+import ClosedReports from './src/screens/ClosedReports';
 
 const primakaraReportsTheme = {
   ...DefaultTheme,
@@ -55,20 +56,22 @@ class App extends React.Component {
   render(){
     return (
       <PaperProvider theme={primakaraReportsTheme}>
-        <Appbar.Header>
-            <Appbar.Action icon="menu" onPress={this.handleMore} />
-            <Appbar.Content title="Primakara Reports" />
-            <Appbar.Action icon="magnify" onPress={this.handleSearch} />
-        </Appbar.Header>
-        <View style={{flex: 10}}>
-          <QueuedReports theme={primakaraReportsTheme} />
+        <View style={{flex: 1}}>
+          <Appbar.Header>
+              <Appbar.Action icon="menu" onPress={this.handleMore} />
+              <Appbar.Content title="Primakara Reports" />
+              <Appbar.Action icon="magnify" onPress={this.handleSearch} />
+          </Appbar.Header>
+          <View style={{flex: 10}}>
+            <ClosedReports theme={primakaraReportsTheme} />
+          </View>
+          <BottomNavigation
+                navigationState={this.state}
+                onIndexChange={this.handleIndexChange}
+                renderScene={this.renderScene}
+                style={{flex: 0}}
+            />
         </View>
-        <BottomNavigation
-              navigationState={this.state}
-              onIndexChange={this.handleIndexChange}
-              renderScene={this.renderScene}
-              style={{flex: 0}}
-          />
       </PaperProvider>
     );
   }
