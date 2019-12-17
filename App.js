@@ -3,12 +3,12 @@ import {
   SafeAreaView
 } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
-import Home from './src/screens/Home';
+import ClosedReports from './src/screens/ClosedReports';
 
 const App = () => {
   return (
     <PaperProvider>
-      <Home />
+     	<ClosedReports />
     </PaperProvider>
   );
 };
