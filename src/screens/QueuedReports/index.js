@@ -1,20 +1,46 @@
 import * as React from 'react';
-import {Appbar} from 'react-native-paper';
+import { Button, Card, Title, Paragraph } from 'react-native-paper';
+import { ScrollView } from 'react-native';
 
-export default class QueuedReports extends React.Component{
-    goBack = () => console.log('went back');
+export default class QueuedReports extends React.Component {    
 
-    handleSearch = () => console.log('Searching');
+    render() {
+        return (
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                <Card>
+                    <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+                    <Card.Content>
+                        <Title>The First Report</Title>
+                        <Paragraph>this is about a broken stuff</Paragraph>
+                    </Card.Content>
+                    <Card.Actions>
+                        <Button>Proceed</Button>
+                    </Card.Actions>
+                </Card>
 
-    handleMore = () => console.log('Shown more');
-    
-    render(){
-        return(
-            <Appbar.Header>
-                 <Appbar.Action icon="menu" onPress={this.handleMore}/>
-                <Appbar.Content title="Primakara Reports"/>
-                <Appbar.Action icon="magnify" onPress={this.handleSearch}/>
-            </Appbar.Header>
+                <Card>
+                    <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+                    <Card.Content>
+                        <Title>The First Report</Title>
+                        <Paragraph>this is about a broken stuff</Paragraph>
+                    </Card.Content>
+                    <Card.Actions>
+                        <Button>Proceed</Button>
+                    </Card.Actions>
+                </Card>
+
+                <Card>
+                    <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+                    <Card.Content>
+                        <Title>The First Report</Title>
+                        <Paragraph>this is about a broken stuff</Paragraph>
+                    </Card.Content>
+                    <Card.Actions>
+                        <Button>Proceed</Button>
+                    </Card.Actions>
+                </Card>
+            </ScrollView>
+
         );
     }
 }
