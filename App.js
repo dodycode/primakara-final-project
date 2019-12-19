@@ -8,6 +8,7 @@ import { BottomNavigation, Appbar, DefaultTheme, Text, Provider as PaperProvider
 import QueuedReports from './src/screens/QueuedReports';
 import ClosedReports from './src/screens/ClosedReports';
 import StaffList from './src/screens/StaffList';
+import About from './src/screens/About';
 
 const MusicRoute = () => <Text>Musicaaa</Text>;
 
@@ -64,20 +65,20 @@ class App extends React.Component {
       <PaperProvider theme={theme}>
         <View style={{flex: 1}}>
           <Appbar.Header
-          	style={{backgroundColor: '#1976D2'}}>
+          	style={{backgroundColor: '#1976d2'}}>
               <Appbar.Action icon="menu" onPress={this.handleMore} />
               <Appbar.Content title="Primakara Reports" />
               <Appbar.Action icon="magnify" onPress={this.handleSearch} />
           </Appbar.Header>
           <View style={{flex: 10}}>
-            <QueuedReports />
+            <About />
           </View>
           <BottomNavigation
                 navigationState={this.state}
                 onIndexChange={this.handleIndexChange}
                 renderScene={this.renderScene}
                 style={{flex: 0}}
-                barStyle={{backgroundColor: '#1976D2'}}
+                barStyle={{backgroundColor: '#1976d2'}}
             />
         </View>
       </PaperProvider>
