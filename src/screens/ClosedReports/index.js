@@ -20,9 +20,9 @@ class ClosedReports extends React.Component {
 
         return (
             <ScrollView contentContainerStyle={{ flexGrow: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
-                {imgData.map(data => {
+                {imgData.map((index, data) => {
                     return (
-                        <View style={style.imgWrapper}>
+                        <View key={index} style={style.imgWrapper}>
                             <TouchableOpacity onPress={this._showDialog}>
                                 <Image
                                     source={{ uri: 'https://picsum.photos/700' }}
