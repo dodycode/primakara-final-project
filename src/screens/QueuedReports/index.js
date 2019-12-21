@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider } from 'react-native-paper';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple } from 'react-native-paper';
+import { ScrollView, StyleSheet, View, Image } from 'react-native';
 
 class QueuedReports extends React.Component {
     render() {
@@ -10,17 +10,22 @@ class QueuedReports extends React.Component {
                 {imgData.map((data, index) => {
                     return (
                         <View key={index}>
-                        <Card>
-                            <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
-                            <Card.Content style={{flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
-                                <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
-                                <View>
-                                    <Text>Dobleh Awwwse</Text>
-                                    <Caption>Head of UPT</Caption>
-                                </View>
-                            </Card.Content>
-                        </Card>
-                        <Divider/>
+                            <Card>
+                                <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+                                <Card.Content style={{flexDirection: 'row', paddingTop: 10, paddingBottom: 15, position: 'relative'}}>
+                                    <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
+                                    <View>
+                                        <Text>Toilet rusak dan mengeluarkan Bau Menyengat</Text>
+                                        <Caption>Arif Muhammad - 3 Hari yang lalu</Caption>
+                                    </View>
+                                    <TouchableRipple style={{position: 'absolute', right: 8, top: 16}}>
+                                        <Image
+                                        style={{width: 14, height: 14, resizeMode: 'contain'}} 
+                                        source={require('../../assets/menu.png')}></Image>
+                                    </TouchableRipple>
+                                </Card.Content>
+                            </Card>
+                            <Divider />
                         </View>
                     );
                 })}
@@ -28,5 +33,9 @@ class QueuedReports extends React.Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+
+})
 
 export default QueuedReports;

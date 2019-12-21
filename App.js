@@ -71,7 +71,7 @@ class App extends React.Component {
               <Appbar.Action icon="magnify" onPress={this.handleSearch} />
           </Appbar.Header>
           <View style={{flex: 10}}>
-            <About />
+            <QueuedReports />
           </View>
           <BottomNavigation
                 navigationState={this.state}
