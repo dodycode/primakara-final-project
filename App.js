@@ -7,6 +7,7 @@ import {
 import { BottomNavigation, Appbar, DefaultTheme, Text, Provider as PaperProvider } from 'react-native-paper';
 import QueuedReports from './src/screens/QueuedReports';
 import ClosedReports from './src/screens/ClosedReports';
+import AddNew from './src/screens/AddNew';
 import StaffList from './src/screens/StaffList';
 import About from './src/screens/About';
 
@@ -71,7 +72,7 @@ class App extends React.Component {
               <Appbar.Action icon="magnify" onPress={this.handleSearch} />
           </Appbar.Header>
           <View style={{flex: 10}}>
-            <QueuedReports />
+            <AddNew />
           </View>
           <BottomNavigation
                 navigationState={this.state}
