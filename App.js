@@ -69,10 +69,9 @@ class App extends React.Component {
           	style={{backgroundColor: '#1976d2'}}>
               <Appbar.Action icon="menu" onPress={this.handleMore} />
               <Appbar.Content title="Primakara Reports" />
-              <Appbar.Action icon="magnify" onPress={this.handleSearch} />
           </Appbar.Header>
           <View style={{flex: 10}}>
-            <AddNew />
+            <About />
           </View>
           <BottomNavigation
                 navigationState={this.state}

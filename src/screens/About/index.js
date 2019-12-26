@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { List, Avatar, Card, Subheading, Paragraph, Headline } from 'react-native-paper';
-import {View, Image} from 'react-native';
+import {View, Image, ScrollView} from 'react-native';
 
 class About extends React.Component {
   state = {
@@ -14,7 +14,7 @@ class About extends React.Component {
 
   render() {
     return (
-      <View>
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <Image style={{width: '100%', height: 200}} source={{uri:'https://ak2.picdn.net/shutterstock/videos/9707132/thumb/1.jpg'}}/>
         <View style={{paddingHorizontal: 17}}>
         <Headline style={{alignSelf: 'center', marginTop: 8}}>About</Headline>
@@ -32,7 +32,7 @@ class About extends React.Component {
           <Subheading style={{marginRight:80}}>Jamal</Subheading>
           <Subheading>Kabur</Subheading>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }
