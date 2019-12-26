@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ScrollView, View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { Dialog, Portal, Button, Paragraph } from 'react-native-paper';
+import MainHeader from '../../components/MainHeader';
 
 const fullWidth = Dimensions.get('window').width;
 
@@ -19,36 +20,39 @@ class ClosedReports extends React.Component {
         const imgData = ['1', '2', '3', '4', '5', '6', '7', '8']
 
         return (
-            <ScrollView contentContainerStyle={{ flexGrow: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
-                {imgData.map((index, data) => {
-                    return (
-                        <View key={index} style={style.imgWrapper}>
-                            <TouchableOpacity onPress={this._showDialog}>
+            <React.Fragment>
+                <MainHeader />
+                <ScrollView contentContainerStyle={{ flexGrow: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {imgData.map((index, data) => {
+                        return (
+                            <View key={index} style={style.imgWrapper}>
+                                <TouchableOpacity onPress={this._showDialog}>
+                                    <Image
+                                        source={{ uri: 'https://picsum.photos/700' }}
+                                        style={style.img} />
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    })}
+
+                    <Portal>
+                        <Dialog
+                            visible={this.state.visible}
+                            onDismiss={this._hideDialog}>
+                            <Dialog.Title>The First Report</Dialog.Title>
+                            <Dialog.Content>
                                 <Image
                                     source={{ uri: 'https://picsum.photos/700' }}
-                                    style={style.img} />
-                            </TouchableOpacity>
-                        </View>
-                    )
-                })}
-
-                <Portal>
-                    <Dialog
-                        visible={this.state.visible}
-                        onDismiss={this._hideDialog}>
-                        <Dialog.Title>The First Report</Dialog.Title>
-                        <Dialog.Content>
-                            <Image
-                                source={{ uri: 'https://picsum.photos/700' }}
-                                style={style.imgDidalem} />
-                            <Paragraph>this is about a broken stuff</Paragraph>
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={this._hideDialog}>Done</Button>
-                        </Dialog.Actions>
-                    </Dialog>
-                </Portal>
-            </ScrollView>
+                                    style={style.imgDidalem} />
+                                <Paragraph>this is about a broken stuff</Paragraph>
+                            </Dialog.Content>
+                            <Dialog.Actions>
+                                <Button onPress={this._hideDialog}>Done</Button>
+                            </Dialog.Actions>
+                        </Dialog>
+                    </Portal>
+                </ScrollView>
+            </React.Fragment>
         );
     }
 }

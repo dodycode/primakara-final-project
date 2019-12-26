@@ -2,38 +2,42 @@ import React from 'react';
 import { View, ImageBackground, StyleSheet, TextInput, Dimensions, Image, ScrollView } from 'react-native';
 import { TouchableRipple, TextInput as ReactNativeTextInput, Caption, Text } from 'react-native-paper';
 import Ripple from 'react-native-material-ripple';
+import MainHeader from '../../components/MainHeader';
 
 const ukuranLayar = Dimensions.get('window').width;
 
 class AddNew extends React.Component {
     render() {
         return (
-            <ScrollView style={{ flexDirection: "column", backgroundColor: 'white', flex: 1, flexGrow: 1 }}>
-                <ImageBackground source={require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
-                    <TextInput
-                        placeholder="Tulis Judul Report..."
-                        placeholderTextColor="#fff"
-                        style={styles.imgtext}
-                    />
-                    <TouchableRipple style={{position: 'absolute', bottom: 17, right: 18}}>
-                        <Image source={require('../../assets/photo-camera.png')} style={{width: 20, height: 20}}></Image>
-                    </TouchableRipple>
-                </ImageBackground>
-                <View style={{padding: 16, flexDirection: 'column'}}>
-                    <Caption>Description</Caption>
-                    <ReactNativeTextInput 
-                    mode="outlined" 
-                    style={{backgroundColor: "white", fontSize: 12}} 
-                    theme={textInputConfig} 
-                    multiline={true} 
-                    placeholder="Type something..."/>
-                    <Ripple 
-                    rippleColor="white"
-                    style={styles.btnRipple}>
-                        <Text style={{color: 'white', alignSelf: 'center'}}>Save Report!</Text>
-                    </Ripple>
-                </View>
-            </ScrollView>
+            <React.Fragment>
+                <MainHeader />
+                <ScrollView style={{ flexDirection: "column", backgroundColor: 'white', flex: 1, flexGrow: 1 }}>
+                    <ImageBackground source={require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
+                        <TextInput
+                            placeholder="Tulis Judul Report..."
+                            placeholderTextColor="#fff"
+                            style={styles.imgtext}
+                        />
+                        <TouchableRipple style={{position: 'absolute', bottom: 17, right: 18}}>
+                            <Image source={require('../../assets/photo-camera.png')} style={{width: 20, height: 20}}></Image>
+                        </TouchableRipple>
+                    </ImageBackground>
+                    <View style={{padding: 16, flexDirection: 'column'}}>
+                        <Caption>Description</Caption>
+                        <ReactNativeTextInput 
+                        mode="outlined" 
+                        style={{backgroundColor: "white", fontSize: 12}} 
+                        theme={textInputConfig} 
+                        multiline={true} 
+                        placeholder="Type something..."/>
+                        <Ripple 
+                        rippleColor="white"
+                        style={styles.btnRipple}>
+                            <Text style={{color: 'white', alignSelf: 'center'}}>Save Report!</Text>
+                        </Ripple>
+                    </View>
+                </ScrollView>
+            </React.Fragment>
         );
     }
 }

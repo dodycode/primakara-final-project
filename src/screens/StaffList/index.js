@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Avatar, Caption, Subheading, Divider, TouchableRipple } from 'react-native-paper';
+import MainHeader from '../../components/MainHeader';
 class StaffList extends React.Component{
  render(){
   let staffs = [
@@ -26,28 +27,31 @@ class StaffList extends React.Component{
   	}
   ];
   return(
-   <View style={styles.container}>
-   		{
-   			staffs.map((staff, index, arr) => {
-   				return(
-   					<View key={index}>
-	   					<View style={styles.userCard}>
-				   			<Avatar.Image style={{marginRight: 5}} size={50} source={{uri: 'https://source.unsplash.com/50x50/?people'}}/>
-				   			<View style={styles.userContent}>
-				   				<Subheading>{staff.title}</Subheading>
-				   				<Caption>{staff.job}</Caption>
-				   			</View>
-				   			<TouchableRipple style={styles.btn} rippleColor="rgba(0, 0, 0, .32)">
-			   					<Image style={{width: 14, resizeMode: 'contain'}} source={require('../../assets/menu.png')}/>
-			   				</TouchableRipple>
-				   		</View>
+   <React.Fragment>
+   	   <MainHeader />
+	   <View style={styles.container}>
+	   		{
+	   			staffs.map((staff, index, arr) => {
+	   				return(
+	   					<View key={index}>
+		   					<View style={styles.userCard}>
+					   			<Avatar.Image style={{marginRight: 5}} size={50} source={{uri: 'https://source.unsplash.com/50x50/?people'}}/>
+					   			<View style={styles.userContent}>
+					   				<Subheading>{staff.title}</Subheading>
+					   				<Caption>{staff.job}</Caption>
+					   			</View>
+					   			<TouchableRipple style={styles.btn} rippleColor="rgba(0, 0, 0, .32)">
+				   					<Image style={{width: 14, resizeMode: 'contain'}} source={require('../../assets/menu.png')}/>
+				   				</TouchableRipple>
+					   		</View>
 
-				   		{arr.length - 1 != index ? <Divider /> : null}
-			   		</View>
-   				);
-   			})
-   		}
-   </View>
+					   		{arr.length - 1 != index ? <Divider /> : null}
+				   		</View>
+	   				);
+	   			})
+	   		}
+	   </View>
+   </React.Fragment>
   );
  }
 }
