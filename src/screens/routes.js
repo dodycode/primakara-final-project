@@ -10,8 +10,8 @@ import ClosedReports from './ClosedReports';
 import AddNew from './AddNew';
 import StaffList from './StaffList';
 import About from './About';
-import Login from './Auth/Login';
-import Register from './Auth/Register';
+import Login from './Authentication/Login';
+import Register from './Authentication/Register';
 
 const AppNavigator = createMaterialBottomTabNavigator(
   {
