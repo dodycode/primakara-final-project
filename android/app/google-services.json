@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "468714501220",
+    "firebase_url": "https://primakara-reports.firebaseio.com",
+    "project_id": "primakara-reports",
+    "storage_bucket": "primakara-reports.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468714501220:android:e48d4687fe0104efe89b71",
+        "android_client_info": {
+          "package_name": "com.primakarareports"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "468714501220-cmkttotuhe2748477cl6d2lihae7mqa8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.primakarareports",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "468714501220-l0119ibdhifvd7i1dm5g18nmpveecrcg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRePCh4swy1yECbRgfsyUrd_FyglqPULQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "468714501220-l0119ibdhifvd7i1dm5g18nmpveecrcg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
