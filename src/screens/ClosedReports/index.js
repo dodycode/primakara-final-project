@@ -21,7 +21,7 @@ class ClosedReports extends React.Component {
 
         return (
             <React.Fragment>
-                <MainHeader />
+                <MainHeader navigation={this.props.navigation}/>
                 <ScrollView contentContainerStyle={{ flexGrow: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
                     {imgData.map((index, data) => {
                         return (

@@ -8,7 +8,7 @@ class QueuedReports extends React.Component {
         const imgData = ['1', '2', '3', '4', '5', '6', '7', '8']
         return (
             <React.Fragment>
-                <MainHeader />
+                <MainHeader navigation={this.props.navigation}/>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     {imgData.map((data, index) => {
                         return (

@@ -11,10 +11,6 @@ class MainHeader extends React.Component {
 		super(props);
 	}
 
-	handleMore() {
-		console.log('show more');
-	}
-
 	render() {
 		const theme = {
 	  	  ...DefaultTheme,
@@ -24,7 +20,7 @@ class MainHeader extends React.Component {
 	  	return (
 	  		<Appbar.Header
 	          	style={{backgroundColor: '#1976d2'}}>
-	            <Appbar.Action icon="menu" onPress={this.handleMore} />
+	            <Appbar.Action icon="menu" onPress={() => this.props.navigation.toggleDrawer()} />
 	            <Appbar.Content title="Primakara Reports" />
 	        </Appbar.Header>
 	  	);

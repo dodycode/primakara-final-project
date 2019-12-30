@@ -16,7 +16,7 @@ class About extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <MainHeader />
+        <MainHeader navigation={this.props.navigation}/>
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <Image style={{width: '100%', height: 200}} source={{uri:'https://ak2.picdn.net/shutterstock/videos/9707132/thumb/1.jpg'}}/>
           <View style={{paddingHorizontal: 17}}>

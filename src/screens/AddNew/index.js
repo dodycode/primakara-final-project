@@ -10,7 +10,7 @@ class AddNew extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <MainHeader />
+                <MainHeader navigation={this.props.navigation}/>
                 <ScrollView style={{ flexDirection: "column", backgroundColor: 'white', flex: 1, flexGrow: 1 }}>
                     <ImageBackground source={require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
                         <TextInput

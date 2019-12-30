@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image } from 'react-native';
 import { createAppContainer } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -9,6 +10,8 @@ import ClosedReports from './ClosedReports';
 import AddNew from './AddNew';
 import StaffList from './StaffList';
 import About from './About';
+import Login from './Auth/Login';
+import Register from './Auth/Register';
 
 const AppNavigator = createMaterialBottomTabNavigator(
   {
@@ -67,4 +70,25 @@ const AppNavigator = createMaterialBottomTabNavigator(
   }
 );
 
-export default createAppContainer(AppNavigator);
+const drawerNavigator = createDrawerNavigator({
+  MainApp: {
+    screen: AppNavigator,
+    navigationOptions: {
+      title: 'Home'
+    }
+  },
+  Login: {
+    screen: Login,
+    navigationOptions: {
+      title: 'Sign In'
+    }
+  },
+  Register: {
+    screen: Register,
+    navigationOptions: {
+      title: 'Register'
+    }
+  }
+});
+
+export default createAppContainer(drawerNavigator);
