@@ -17,7 +17,7 @@ class QueuedReports extends React.Component {
                                     <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
                                     <Card.Content style={{flexDirection: 'row', paddingTop: 10, paddingBottom: 15, position: 'relative'}}>
                                         <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
-                                        <View>
+                                        <View style={{flex: 1}}>
                                             <Text>Toilet rusak dan mengeluarkan Bau Menyengat</Text>
                                             <Caption>Arif Muhammad - 3 Hari yang lalu</Caption>
                                         </View>
