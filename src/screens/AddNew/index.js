@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, ImageBackground, StyleSheet, TextInput, Dimensions, Image, ScrollView } from 'react-native';
+import { View, ImageBackground, StyleSheet, TextInput, Dimensions, Image, ScrollView, Alert } from 'react-native';
 import { TouchableRipple, TextInput as ReactNativeTextInput, Caption, Text } from 'react-native-paper';
 import Ripple from 'react-native-material-ripple';
 import MainHeader from '../../components/MainHeader';
+import Loader from '../../components/Loader';
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-picker';
+import moment from "moment";
 
 const ukuranLayar = Dimensions.get('window').width;
 
@@ -16,8 +18,11 @@ class AddNew extends React.Component {
             title: null,
             imgSrc: null,
             desc: null,
-            date: null
+            date: moment(new Date()).fromNow(),
+            loading: false
         }
+
+        this.db = firestore().collection('reports');
     }
 
     handleChangeInput = field => text => {
@@ -49,9 +54,47 @@ class AddNew extends React.Component {
         }
     }
 
+    handleOnSubmit = async () => {
+        const { title, imgSrc, desc, date } = this.state;
+        this.setState({
+            loading: true
+        });
+        if (title != null 
+            && imgSrc != null
+            && desc != null) {
+            let status = 'Queued';
+            await this.db.add({
+                title: title,
+                imgSrc: imgSrc,
+                desc: desc,
+                date: date,
+                status: status
+            }).then(async post => {
+                await this.setState({
+                    loading: false,
+                    title: null,
+                    imgSrc: null,
+                    desc: null
+                });
+                Alert.alert('Success', 'Report kamu telah didaftarkan pada Queued Lists!');
+            }).catch(async err => {
+                await this.setState({
+                    loading: false,
+                });
+                Alert.alert('Error', err);
+            })
+        }else{
+            this.setState({
+                loading: false
+            });
+            Alert.alert('Error', 'Mohon lengkapi seluruh data!');
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
+                <Loader loading={this.state.loading} />
                 <MainHeader navigation={this.props.navigation}/>
                 <ScrollView style={{ flexDirection: "column", backgroundColor: 'white', flex: 1, flexGrow: 1 }}>
                     <ImageBackground source={this.state.imgSrc != null ? {uri: this.state.imgSrc} : require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
@@ -59,6 +102,7 @@ class AddNew extends React.Component {
                             placeholder="Type The Report Title..."
                             placeholderTextColor="#fff"
                             style={styles.imgtext}
+                            onChangeText={this.handleChangeInput('title')}
                         />
                         <TouchableRipple style={{position: 'absolute', bottom: 17, right: 18}}
                         onPress={() => this.handleSelectImage()}>
@@ -71,11 +115,13 @@ class AddNew extends React.Component {
                         mode="outlined" 
                         style={{backgroundColor: "white", fontSize: 12}} 
                         theme={textInputConfig} 
-                        multiline={true} 
+                        multiline={true}
+                        onChangeText={this.handleChangeInput('desc')} 
                         placeholder="Type something..."/>
                         <Ripple 
                         rippleColor="white"
-                        style={styles.btnRipple}>
+                        style={styles.btnRipple}
+                        onPress={this.handleOnSubmit}>
                             <Text style={{color: 'white', alignSelf: 'center'}}>Save Report!</Text>
                         </Ripple>
                     </View>
