@@ -3,22 +3,65 @@ import { View, ImageBackground, StyleSheet, TextInput, Dimensions, Image, Scroll
 import { TouchableRipple, TextInput as ReactNativeTextInput, Caption, Text } from 'react-native-paper';
 import Ripple from 'react-native-material-ripple';
 import MainHeader from '../../components/MainHeader';
+import firestore from '@react-native-firebase/firestore';
+import ImagePicker from 'react-native-image-picker';
 
 const ukuranLayar = Dimensions.get('window').width;
 
 class AddNew extends React.Component {
+    constructor(props){
+        super(props);
+
+        this.state = {
+            title: null,
+            imgSrc: null,
+            desc: null,
+            date: null
+        }
+    }
+
+    handleChangeInput = field => text => {
+        this.setState({
+            [field]: text
+        });
+    };
+
+    handleSelectImage = () => {
+        const options = {
+            quality: 0.5,
+            maxHeight: 200,
+            maxWidth: 200,
+            storageOptions: {
+                skipBackup: true
+            }
+        };
+
+        try {
+            ImagePicker.showImagePicker(options, response => {
+                if (response.data) {
+                    this.setState({
+                        imgSrc: 'data:image/jpeg;base64,' + response.data
+                    });
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
                 <MainHeader navigation={this.props.navigation}/>
                 <ScrollView style={{ flexDirection: "column", backgroundColor: 'white', flex: 1, flexGrow: 1 }}>
-                    <ImageBackground source={require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
+                    <ImageBackground source={this.state.imgSrc != null ? {uri: this.state.imgSrc} : require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
                         <TextInput
                             placeholder="Tulis Judul Report..."
                             placeholderTextColor="#fff"
                             style={styles.imgtext}
                         />
-                        <TouchableRipple style={{position: 'absolute', bottom: 17, right: 18}}>
+                        <TouchableRipple style={{position: 'absolute', bottom: 17, right: 18}}
+                        onPress={() => this.handleSelectImage()}>
                             <Image source={require('../../assets/photo-camera.png')} style={{width: 20, height: 20}}></Image>
                         </TouchableRipple>
                     </ImageBackground>
