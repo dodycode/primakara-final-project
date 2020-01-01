@@ -56,7 +56,7 @@ class AddNew extends React.Component {
                 <ScrollView style={{ flexDirection: "column", backgroundColor: 'white', flex: 1, flexGrow: 1 }}>
                     <ImageBackground source={this.state.imgSrc != null ? {uri: this.state.imgSrc} : require('../../assets/default.jpg')} imageStyle={{ opacity: 0.8}} style={styles.imgfields}>
                         <TextInput
-                            placeholder="Tulis Judul Report..."
+                            placeholder="Type The Report Title..."
                             placeholderTextColor="#fff"
                             style={styles.imgtext}
                         />
