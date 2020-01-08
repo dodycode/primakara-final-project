@@ -5,16 +5,15 @@ import firestore from '@react-native-firebase/firestore';
 import MainHeader from '../../components/MainHeader';
 import Loader from '../../components/Loader';
 
-class QueuedReports extends React.Component {
+class ProceedReports extends React.Component {
     constructor(props){
         super(props);
 
         this.state = {
-            reports: null,
+            proceedReports: null,
             loading: false,
             showMenu: false,
-            currentSelectedId: null,
-            currentSelectedAction: null
+            currentSelectedId: null
         }
     }
 
@@ -30,10 +29,9 @@ class QueuedReports extends React.Component {
         });
     }
 
-    confirmAlert = async (msg, func, id) => {
+    confirmAlert = async (msg, id) => {
         await this.setState({
-            currentSelectedId: id,
-            currentSelectedAction: func
+            currentSelectedId: id
         });
         Alert.alert(
           'Confirmation Message',
@@ -46,14 +44,7 @@ class QueuedReports extends React.Component {
             {
                 text: 'OK', 
                 onPress: () => {
-                    switch(this.state.currentSelectedAction) {
-                        case 1:
-                            this.setProceedReports()
-                            break;
-                        case 2:
-                            this.rejectReports()
-                            break;
-                    }
+                    this.closeReports()
                 }
             },
           ],
@@ -61,7 +52,7 @@ class QueuedReports extends React.Component {
         );
     }
 
-    setProceedReports = async () => {
+    closeReports = async () => {
         if (this.state.currentSelectedId != null) {
             this.setState({
                 loading: true
@@ -70,29 +61,8 @@ class QueuedReports extends React.Component {
             .collection('reports')
             .doc(this.state.currentSelectedId)
             .update({
-                status: 'Proceed'
+                status: 'Closed'
             })
-            .then(async report => {
-                await this.getReports();
-            })
-            .catch(err => {
-                this.setState({
-                    loading: false
-                });
-                Alert.alert('Error', err);
-            });
-        }
-    }
-
-    rejectReports = async () => {
-        if (this.state.currentSelectedId != null) {
-            this.setState({
-                loading: true
-            });
-            await firestore()
-            .collection('reports')
-            .doc(this.state.currentSelectedId)
-            .delete()
             .then(async report => {
                 await this.getReports();
             })
@@ -108,7 +78,7 @@ class QueuedReports extends React.Component {
     getReports = async () => {
         const querySnapshot = await firestore()
         .collection('reports')
-        .where('status', '==', 'Queued')
+        .where('status', '==', 'Proceed')
         .get()
         .then(snapshot => {
             if (snapshot._docs.length > 0) {
@@ -127,12 +97,12 @@ class QueuedReports extends React.Component {
                 });
                 this.setState({
                     loading: false,
-                    reports: list
+                    proceedReports: list
                 });
             }else{
                 this.setState({
                     loading: false,
-                    reports: null
+                    proceedReports: null
                 });
             }
         })
@@ -144,7 +114,7 @@ class QueuedReports extends React.Component {
         });
         this.unsubscribe = firestore()
         .collection('reports')
-        .where('status', '==', 'Queued')
+        .where('status', '==', 'Proceed')
         .onSnapshot({
             error: e => Alert.alert('Error', e),
             next: reports => {
@@ -164,7 +134,7 @@ class QueuedReports extends React.Component {
 
                     this.setState({
                         loading: false,
-                        reports: list
+                        proceedReports: list
                     });
                 }else{
                     this.setState({
@@ -185,8 +155,8 @@ class QueuedReports extends React.Component {
                 <Loader loading={this.state.loading} />
                 <MainHeader navigation={this.props.navigation}/>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    {this.state.reports != null ? (
-                        this.state.reports.map((data, index) => {
+                    {this.state.proceedReports != null ? (
+                        this.state.proceedReports.map((data, index) => {
                             return (
                                 <View key={index}>
                                     <Card>
@@ -214,17 +184,9 @@ class QueuedReports extends React.Component {
                                             }} title="View" />
                                             <Divider />
                                             <Menu.Item 
-                                            title="Proceed" 
+                                            title="Closed" 
                                             onPress={() => this.confirmAlert(
-                                                'Yakin ingin memproses laporan ini??',
-                                                1,
-                                                data.id
-                                            )} />
-                                            <Menu.Item 
-                                            title="Reject"
-                                            onPress={() => this.confirmAlert(
-                                                'Yakin ingin menolak laporan ini??',
-                                                2,
+                                                'Yakin ingin menutup laporan ini??',
                                                 data.id
                                             )} />
                                             </Menu>
@@ -234,7 +196,7 @@ class QueuedReports extends React.Component {
                                 </View>
                             );
                         })
-                    ) : <Caption style={{alignSelf: 'center', marginTop: 14}}>Tidak ada laporan.</Caption>}
+                    ) : <Caption style={{alignSelf: 'center', marginTop: 14}}>Tidak ada laporan sedang diproses.</Caption>}
                 </ScrollView>
             </React.Fragment>
         );
@@ -245,4 +207,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default QueuedReports;
+export default ProceedReports;

@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import QueuedReports from './QueuedReports';
 import ClosedReports from './ClosedReports';
+import ProceedReports from './ProceedReports';
 import AddNew from './AddNew';
 import StaffList from './StaffList';
 import About from './About';
@@ -24,12 +25,12 @@ const AppNavigator = createMaterialBottomTabNavigator(
 				)
 			}
 		},
-		ClosedReports: {
-			screen: ClosedReports,
+		ProceedReports: {
+			screen: ProceedReports,
 			navigationOptions: {
-				title: 'Closed',
+				title: 'Proceed',
 				tabBarIcon: ({ tintColor }) => (
-					<Icon size={23} name='file-check' style={{ color: tintColor }} />
+					<Icon size={23} name='file-chart' style={{ color: tintColor }} />
 				)
 			}
 		},
@@ -45,12 +46,12 @@ const AppNavigator = createMaterialBottomTabNavigator(
 				)
 			}
 		},
-		StaffList: {
-			screen: StaffList,
+		ClosedReports: {
+			screen: ClosedReports,
 			navigationOptions: {
-				title: 'Staff',
+				title: 'Closed',
 				tabBarIcon: ({ tintColor }) => (
-					<Icon size={23} name='account-group' style={{ color: tintColor }} />
+					<Icon size={23} name='file-check' style={{ color: tintColor }} />
 				)
 			}
 		},
