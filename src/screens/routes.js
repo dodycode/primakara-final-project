@@ -1,6 +1,8 @@
 import React from 'react';
 import { Image } from 'react-native';
-import { createAppContainer } from 'react-navigation';
+import SafeAreaView from 'react-native-safe-area-view';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,6 +15,7 @@ import StaffList from './StaffList';
 import About from './About';
 import Login from './Authentication/Login';
 import Register from './Authentication/Register';
+import Logout from './Logout';
 
 const AppNavigator = createMaterialBottomTabNavigator(
 	{
@@ -71,13 +74,22 @@ const AppNavigator = createMaterialBottomTabNavigator(
 	}
 );
 
-const drawerNavigator = createDrawerNavigator({
+const DrawerNavigator = createDrawerNavigator({
 	MainApp: {
 		screen: AppNavigator,
 		navigationOptions: {
 			title: 'Home'
 		}
 	},
+	Logout: {
+		screen: Logout,
+		navigationOptions: {
+			title: 'Log out'
+		}
+	}
+});
+
+const AuthStack = createStackNavigator({
 	Login: {
 		screen: Login,
 		navigationOptions: {
@@ -90,6 +102,14 @@ const drawerNavigator = createDrawerNavigator({
 			title: 'Register'
 		}
 	}
+},
+{
+	headerMode: 'none'
 });
 
-export default createAppContainer(drawerNavigator);
+const Navigators = createSwitchNavigator({
+  Auth: {screen: AuthStack},
+  App: {screen: DrawerNavigator},
+});
+
+export default createAppContainer(Navigators);

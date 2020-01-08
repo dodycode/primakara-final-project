@@ -5,6 +5,7 @@ import Ripple from 'react-native-material-ripple';
 import MainHeader from '../../components/MainHeader';
 import Loader from '../../components/Loader';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-picker';
 import moment from "moment";
 
@@ -19,10 +20,41 @@ class AddNew extends React.Component {
             imgSrc: null,
             desc: null,
             date: moment(new Date()).fromNow(),
-            loading: false
+            loading: false,
+            currentUser: null
         }
 
         this.db = firestore().collection('reports');
+    }
+
+    getUser = async () => {
+      try {
+        const value = await AsyncStorage.getItem('user_id');
+        if(value !== null) {
+          await firestore()
+            .collection('users')
+            .where('uid', '==', value)
+            .get()
+            .then(async snapshot => {
+                let list = [];
+                snapshot.docs.forEach(user => {
+                    const { fullName, isStaff } = user.data();
+                    list.push({
+                        fullName,
+                        isStaff
+                    })
+                });
+                this.setState({
+                    currentUser: list
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            })
+        }
+      } catch(e) {
+        console.error(e);
+      }
     }
 
     handleChangeInput = field => text => {
@@ -55,7 +87,7 @@ class AddNew extends React.Component {
     }
 
     handleOnSubmit = async () => {
-        const { title, imgSrc, desc, date } = this.state;
+        const { title, imgSrc, desc, date, currentUser } = this.state;
         this.setState({
             loading: true
         });
@@ -68,7 +100,8 @@ class AddNew extends React.Component {
                 imgSrc: imgSrc,
                 desc: desc,
                 date: date,
-                status: status
+                status: status,
+                user: currentUser[0].fullName
             }).then(async post => {
                 await this.setState({
                     loading: false,
@@ -89,6 +122,10 @@ class AddNew extends React.Component {
             });
             Alert.alert('Error', 'Mohon lengkapi seluruh data!');
         }
+    }
+
+    componentDidMount() {
+        this.getUser();
     }
 
     render() {

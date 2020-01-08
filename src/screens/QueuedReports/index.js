@@ -2,11 +2,12 @@ import * as React from 'react';
 import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu } from 'react-native-paper';
 import { ScrollView, StyleSheet, View, Image, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-community/async-storage';
 import MainHeader from '../../components/MainHeader';
 import Loader from '../../components/Loader';
 
 class QueuedReports extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -14,8 +15,40 @@ class QueuedReports extends React.Component {
             loading: false,
             showMenu: false,
             currentSelectedId: null,
-            currentSelectedAction: null
+            currentSelectedAction: null,
+            currentUser: null
         }
+    }
+
+    getUser = async () => {
+      try {
+        const value = await AsyncStorage.getItem('user_id');
+        if(value !== null) {
+          await firestore()
+            .collection('users')
+            .where('uid', '==', value)
+            .get()
+            .then(async snapshot => {
+                let list = '';
+                await snapshot.docs.forEach(user => {
+                    const { fullName, isStaff } = user.data();
+                    list = {
+                        fullName,
+                        isStaff
+                    }
+                });
+                await this.setState({
+                    currentUser: list
+                });
+                // console.log(this.state.currentUser.isStaff);
+            })
+            .catch(error => {
+                console.error(error);
+            })
+        }
+      } catch(e) {
+        console.error(e);
+      }
     }
 
     hideMenu = () => {
@@ -36,28 +69,26 @@ class QueuedReports extends React.Component {
             currentSelectedAction: func
         });
         Alert.alert(
-          'Confirmation Message',
-          msg,
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-                text: 'OK', 
-                onPress: () => {
-                    switch(this.state.currentSelectedAction) {
-                        case 1:
-                            this.setProceedReports()
-                            break;
-                        case 2:
-                            this.rejectReports()
-                            break;
+            'Confirmation Message',
+            msg,
+            [{
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        switch (this.state.currentSelectedAction) {
+                            case 1:
+                                this.setProceedReports()
+                                break;
+                            case 2:
+                                this.rejectReports()
+                                break;
+                        }
                     }
-                }
-            },
-          ],
-          {cancelable: false},
+                },
+            ], { cancelable: false },
         );
     }
 
@@ -67,20 +98,20 @@ class QueuedReports extends React.Component {
                 loading: true
             });
             await firestore()
-            .collection('reports')
-            .doc(this.state.currentSelectedId)
-            .update({
-                status: 'Proceed'
-            })
-            .then(async report => {
-                await this.getReports();
-            })
-            .catch(err => {
-                this.setState({
-                    loading: false
+                .collection('reports')
+                .doc(this.state.currentSelectedId)
+                .update({
+                    status: 'Proceed'
+                })
+                .then(async report => {
+                    await this.getReports();
+                })
+                .catch(err => {
+                    this.setState({
+                        loading: false
+                    });
+                    Alert.alert('Error', err);
                 });
-                Alert.alert('Error', err);
-            });
         }
     }
 
@@ -90,52 +121,56 @@ class QueuedReports extends React.Component {
                 loading: true
             });
             await firestore()
-            .collection('reports')
-            .doc(this.state.currentSelectedId)
-            .delete()
-            .then(async report => {
-                await this.getReports();
-            })
-            .catch(err => {
-                this.setState({
-                    loading: false
+                .collection('reports')
+                .doc(this.state.currentSelectedId)
+                .delete()
+                .then(async report => {
+                    await this.getReports();
+                })
+                .catch(err => {
+                    this.setState({
+                        loading: false
+                    });
+                    Alert.alert('Error', err);
                 });
-                Alert.alert('Error', err);
-            });
         }
     }
 
     getReports = async () => {
+        this.setState({
+            loading: true
+        });
         const querySnapshot = await firestore()
-        .collection('reports')
-        .where('status', '==', 'Queued')
-        .get()
-        .then(snapshot => {
-            if (snapshot._docs.length > 0) {
-                const list = [];
-                snapshot
-                .docs
-                .forEach(async report => {
-                    const {title, desc, imgSrc, date} = report.data();
-                    await list.push({
-                        id: report.id,
-                        title: title,
-                        desc: desc,
-                        imgSrc: imgSrc,
-                        date: date
+            .collection('reports')
+            .where('status', '==', 'Queued')
+            .get()
+            .then(snapshot => {
+                if (snapshot._docs.length > 0) {
+                    const list = [];
+                    snapshot
+                        .docs
+                        .forEach(async report => {
+                            const { title, desc, imgSrc, date, user } = report.data();
+                            await list.push({
+                                id: report.id,
+                                title: title,
+                                desc: desc,
+                                imgSrc: imgSrc,
+                                date: date,
+                                user: user
+                            });
+                        });
+                    this.setState({
+                        loading: false,
+                        reports: list
                     });
-                });
-                this.setState({
-                    loading: false,
-                    reports: list
-                });
-            }else{
-                this.setState({
-                    loading: false,
-                    reports: null
-                });
-            }
-        })
+                } else {
+                    this.setState({
+                        loading: false,
+                        reports: null
+                    });
+                }
+            })
     }
 
     componentDidMount() {
@@ -143,40 +178,47 @@ class QueuedReports extends React.Component {
             loading: true
         });
         this.unsubscribe = firestore()
-        .collection('reports')
-        .where('status', '==', 'Queued')
-        .onSnapshot({
-            error: e => Alert.alert('Error', e),
-            next: reports => {
-                if (reports._docs.length > 0) {
-                    const list = [];
+            .collection('reports')
+            .where('status', '==', 'Queued')
+            .onSnapshot({
+                error: e => console.error(e),
+                next: reports => {
+                    if (reports._docs.length > 0) {
+                        const list = [];
 
-                    reports.forEach(async report => {
-                        const {title, desc, imgSrc, date} = report.data();
-                        await list.push({
-                            id: report.id,
-                            title: title,
-                            desc: desc,
-                            imgSrc: imgSrc,
-                            date: date
+                        reports.forEach(async report => {
+                            const { title, desc, imgSrc, date, user } = report.data();
+                            await list.push({
+                                id: report.id,
+                                title: title,
+                                desc: desc,
+                                imgSrc: imgSrc,
+                                date: date,
+                                user: user
+                            });
                         });
-                    });
 
-                    this.setState({
-                        loading: false,
-                        reports: list
-                    });
-                }else{
-                    this.setState({
-                        loading: false
-                    });
+                        this.setState({
+                            loading: false,
+                            reports: list
+                        });
+                    } else {
+                        this.setState({
+                            loading: false
+                        });
+                    }
                 }
-            }
+            });
+        this.getUser();
+        //force to recall the method when stack navigate
+        this.focusListener = this.props.navigation.addListener('didFocus', () => {
+            this.getReports();
         });
     }
 
     componentWillUnmount() {
         this.unsubscribe();
+        this.focusListener.remove();
     }
 
     render() {
@@ -195,7 +237,7 @@ class QueuedReports extends React.Component {
                                             <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
                                             <View style={{flex: 1}}>
                                                 <Text>{data.title}</Text>
-                                                <Caption>Arif Muhammad - {data.date}</Caption>
+                                                <Caption>{data.user} - {data.date}</Caption>
                                             </View>
                                             <Menu
                                                 visible={this.state.showMenu == data.id}
@@ -213,20 +255,30 @@ class QueuedReports extends React.Component {
                                                 Alert.alert(data.title, data.desc)
                                             }} title="View" />
                                             <Divider />
-                                            <Menu.Item 
-                                            title="Proceed" 
-                                            onPress={() => this.confirmAlert(
-                                                'Yakin ingin memproses laporan ini??',
-                                                1,
-                                                data.id
-                                            )} />
-                                            <Menu.Item 
-                                            title="Reject"
-                                            onPress={() => this.confirmAlert(
-                                                'Yakin ingin menolak laporan ini??',
-                                                2,
-                                                data.id
-                                            )} />
+                                            {
+                                                this.state.currentUser != null ? 
+                                                ( 
+                                                    this.state.currentUser.isStaff ? 
+                                                        (
+                                                            <React.Fragment>
+                                                                <Menu.Item 
+                                                                title="Proceed" 
+                                                                onPress={() => this.confirmAlert(
+                                                                    'Yakin ingin memproses laporan ini??',
+                                                                    1,
+                                                                    data.id
+                                                                )} />
+                                                                <Menu.Item 
+                                                                title="Reject"
+                                                                onPress={() => this.confirmAlert(
+                                                                    'Yakin ingin menolak laporan ini??',
+                                                                    2,
+                                                                    data.id
+                                                                )} />
+                                                            </React.Fragment>
+                                                        ) : null 
+                                                    ) : null
+                                                } 
                                             </Menu>
                                         </Card.Content>
                                     </Card>

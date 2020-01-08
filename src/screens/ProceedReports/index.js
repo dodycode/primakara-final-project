@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu } from 'react-native-paper';
 import { ScrollView, StyleSheet, View, Image, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-community/async-storage';
 import MainHeader from '../../components/MainHeader';
 import Loader from '../../components/Loader';
 
@@ -13,8 +14,42 @@ class ProceedReports extends React.Component {
             proceedReports: null,
             loading: false,
             showMenu: false,
-            currentSelectedId: null
+            currentSelectedId: null,
+            currentUser: null
         }
+
+        this.getUser();
+    }
+
+    getUser = async () => {
+      try {
+        const value = await AsyncStorage.getItem('user_id');
+        if(value !== null) {
+          await firestore()
+            .collection('users')
+            .where('uid', '==', value)
+            .get()
+            .then(async snapshot => {
+                let list = '';
+                await snapshot.docs.forEach(user => {
+                    const { fullName, isStaff } = user.data();
+                    list = {
+                        fullName,
+                        isStaff
+                    }
+                });
+                await this.setState({
+                    currentUser: list
+                });
+                // console.log(this.state.currentUser.isStaff);
+            })
+            .catch(error => {
+                console.error(error);
+            })
+        }
+      } catch(e) {
+        console.error(e);
+      }
     }
 
     hideMenu = () => {
@@ -64,7 +99,7 @@ class ProceedReports extends React.Component {
                 status: 'Closed'
             })
             .then(async report => {
-                await this.getReports();
+                await this.getProceedReports();
             })
             .catch(err => {
                 this.setState({
@@ -75,7 +110,10 @@ class ProceedReports extends React.Component {
         }
     }
 
-    getReports = async () => {
+    getProceedReports = async () => {
+        this.setState({
+            loading: true
+        });
         const querySnapshot = await firestore()
         .collection('reports')
         .where('status', '==', 'Proceed')
@@ -86,13 +124,14 @@ class ProceedReports extends React.Component {
                 snapshot
                 .docs
                 .forEach(async report => {
-                    const {title, desc, imgSrc, date} = report.data();
+                    const {title, desc, imgSrc, date, user} = report.data();
                     await list.push({
                         id: report.id,
                         title: title,
                         desc: desc,
                         imgSrc: imgSrc,
-                        date: date
+                        date: date,
+                        user: user
                     });
                 });
                 this.setState({
@@ -122,13 +161,14 @@ class ProceedReports extends React.Component {
                     const list = [];
 
                     reports.forEach(async report => {
-                        const {title, desc, imgSrc, date} = report.data();
+                        const {title, desc, imgSrc, date, user} = report.data();
                         await list.push({
                             id: report.id,
                             title: title,
                             desc: desc,
                             imgSrc: imgSrc,
-                            date: date
+                            date: date,
+                            user: user
                         });
                     });
 
@@ -143,10 +183,15 @@ class ProceedReports extends React.Component {
                 }
             }
         });
+        //force to recall the method when stack navigate
+        this.focusListener = this.props.navigation.addListener('didFocus', () => {
+            this.getProceedReports();
+        });
     }
 
     componentWillUnmount() {
         this.unsubscribe();
+        this.focusListener.remove();
     }
 
     render() {
@@ -165,31 +210,39 @@ class ProceedReports extends React.Component {
                                             <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
                                             <View style={{flex: 1}}>
                                                 <Text>{data.title}</Text>
-                                                <Caption>Arif Muhammad - {data.date}</Caption>
+                                                <Caption>{data.user} - {data.date}</Caption>
                                             </View>
-                                            <Menu
-                                                visible={this.state.showMenu == data.id}
-                                                onDismiss={this.hideMenu}
-                                                anchor={
-                                                    <TouchableRipple
-                                                    onPress={() => this.showMenu(data.id)}>
-                                                        <Image
-                                                        style={{width: 14, height: 14, resizeMode: 'contain'}} 
-                                                        source={require('../../assets/menu.png')}></Image>
-                                                    </TouchableRipple>
-                                                }
-                                            >
-                                            <Menu.Item onPress={() => {
-                                                Alert.alert(data.title, data.desc)
-                                            }} title="View" />
-                                            <Divider />
-                                            <Menu.Item 
-                                            title="Closed" 
-                                            onPress={() => this.confirmAlert(
-                                                'Yakin ingin menutup laporan ini??',
-                                                data.id
-                                            )} />
-                                            </Menu>
+                                            {
+                                                this.state.currentUser != null ? 
+                                                (
+                                                    this.state.currentUser.isStaff ?
+                                                    (
+                                                        <Menu
+                                                            visible={this.state.showMenu == data.id}
+                                                            onDismiss={this.hideMenu}
+                                                            anchor={
+                                                                <TouchableRipple
+                                                                onPress={() => this.showMenu(data.id)}>
+                                                                        <Image
+                                                                        style={{width: 14, height: 14, resizeMode: 'contain'}} 
+                                                                        source={require('../../assets/menu.png')}></Image>
+                                                                    </TouchableRipple>
+                                                                }
+                                                            >
+                                                            <Menu.Item onPress={() => {
+                                                                Alert.alert(data.title, data.desc)
+                                                            }} title="View" />
+                                                            <Divider />
+                                                            <Menu.Item 
+                                                            title="Closed" 
+                                                            onPress={() => this.confirmAlert(
+                                                                'Yakin ingin menutup laporan ini??',
+                                                                data.id
+                                                            )} />
+                                                        </Menu>
+                                                    ) : null 
+                                                ) : null
+                                            }
                                         </Card.Content>
                                     </Card>
                                     <Divider />
