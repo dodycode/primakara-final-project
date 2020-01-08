@@ -103,6 +103,7 @@ class AddNew extends React.Component {
                             placeholderTextColor="#fff"
                             style={styles.imgtext}
                             onChangeText={this.handleChangeInput('title')}
+                            value={this.state.title}
                         />
                         <TouchableRipple style={{position: 'absolute', bottom: 17, right: 18}}
                         onPress={() => this.handleSelectImage()}>
@@ -116,7 +117,8 @@ class AddNew extends React.Component {
                         style={{backgroundColor: "white", fontSize: 12}} 
                         theme={textInputConfig} 
                         multiline={true}
-                        onChangeText={this.handleChangeInput('desc')} 
+                        onChangeText={this.handleChangeInput('desc')}
+                        value={this.state.desc} 
                         placeholder="Type something..."/>
                         <Ripple 
                         rippleColor="white"
