@@ -11,6 +11,7 @@ import QueuedReports from './QueuedReports';
 import ClosedReports from './ClosedReports';
 import ProceedReports from './ProceedReports';
 import AddNew from './AddNew';
+import EditReports from './EditReports';
 import StaffList from './StaffList';
 import About from './About';
 import Login from './Authentication/Login';
@@ -86,6 +87,14 @@ const DrawerNavigator = createDrawerNavigator({
 		navigationOptions: {
 			title: 'Log out'
 		}
+	},
+	EditReports: {
+		screen: EditReports,
+		navigationOptions: ({navigation}) => {
+            return {
+                drawerLabel: () => null,
+            }
+        }
 	}
 });
 

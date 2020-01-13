@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios';
 import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu } from 'react-native-paper';
 import { ScrollView, StyleSheet, View, Image, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
@@ -31,16 +32,17 @@ class QueuedReports extends React.Component {
             .then(async snapshot => {
                 let list = '';
                 await snapshot.docs.forEach(user => {
-                    const { fullName, isStaff } = user.data();
+                    const { fullName, isStaff, uid } = user.data();
                     list = {
                         fullName,
-                        isStaff
+                        isStaff,
+                        uid
                     }
                 });
                 await this.setState({
                     currentUser: list
                 });
-                // console.log(this.state.currentUser.isStaff);
+                // console.log(this.state.currentUser);
             })
             .catch(error => {
                 console.error(error);
@@ -49,6 +51,20 @@ class QueuedReports extends React.Component {
       } catch(e) {
         console.error(e);
       }
+    }
+
+    handleNotif = async msg => {
+        axios.defaults.headers.common['Authorization'] = 'Basic MTdmZTdjYWQtMWZjYi00ZjVjLTk0MDUtYzE3ZDVlNGMwNDM5';
+        axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+        await axios({
+            method: 'POST',
+            url: 'https://onesignal.com/api/v1/notifications',
+            data: {
+                app_id: 'c4c46357-ea12-41f9-bf10-0cdce1f3cdad',
+                contents: {"en" : msg},
+                included_segments: ['All']
+            }
+        }).catch(err => console.error(err));
     }
 
     hideMenu = () => {
@@ -77,12 +93,18 @@ class QueuedReports extends React.Component {
                 },
                 {
                     text: 'OK',
-                    onPress: () => {
+                    onPress: async () => {
+                        const { reports, currentSelectedId, currentUser } = this.state;
+                        let selectedReport = await reports.find(report => {
+                            return report.id == currentSelectedId;
+                        });
                         switch (this.state.currentSelectedAction) {
                             case 1:
+                                await this.handleNotif('[INFO]: Report ['+selectedReport.title+'] telah diproses oleh '+currentUser.fullName);
                                 this.setProceedReports()
                                 break;
                             case 2:
+                                await this.handleNotif('[INFO]: Report ['+selectedReport.title+'] telah di hapus oleh '+currentUser.fullName);
                                 this.rejectReports()
                                 break;
                         }
@@ -103,8 +125,8 @@ class QueuedReports extends React.Component {
                 .update({
                     status: 'Proceed'
                 })
-                .then(async report => {
-                    await this.getReports();
+                .then(async () => {
+                    this.getReports();
                 })
                 .catch(err => {
                     this.setState({
@@ -237,7 +259,7 @@ class QueuedReports extends React.Component {
                                             <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
                                             <View style={{flex: 1}}>
                                                 <Text>{data.title}</Text>
-                                                <Caption>{data.user} - {data.date}</Caption>
+                                                <Caption>{data.user.fullName} - {data.date}</Caption>
                                             </View>
                                             <Menu
                                                 visible={this.state.showMenu == data.id}
@@ -276,7 +298,33 @@ class QueuedReports extends React.Component {
                                                                     data.id
                                                                 )} />
                                                             </React.Fragment>
-                                                        ) : null 
+                                                        ) :
+                                                        (
+                                                            <React.Fragment>
+                                                                <Menu.Item 
+                                                                title="Edit" 
+                                                                onPress={async () => {
+                                                                    await this.setState({
+                                                                        showMenu: false
+                                                                    });
+                                                                    this.props
+                                                                    .navigation
+                                                                    .navigate(
+                                                                        'EditReports', 
+                                                                        {
+                                                                            reportId: data.id,
+                                                                        }
+                                                                    );
+                                                                }} />
+                                                                <Menu.Item 
+                                                                title="Delete"
+                                                                onPress={() => this.confirmAlert(
+                                                                    'Yakin ingin menghapus laporan ini??',
+                                                                    2,
+                                                                    data.id
+                                                                )} />
+                                                            </React.Fragment>
+                                                        )
                                                     ) : null
                                                 } 
                                             </Menu>

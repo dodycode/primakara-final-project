@@ -12,7 +12,7 @@ import moment from "moment";
 
 const ukuranLayar = Dimensions.get('window').width;
 
-class AddNew extends React.Component {
+class EditReports extends React.Component {
     constructor(props){
         super(props);
 
@@ -25,7 +25,37 @@ class AddNew extends React.Component {
             currentUser: null
         }
 
-        this.db = firestore().collection('reports');
+        this.db = firestore()
+        .collection('reports')
+        .doc(this.props.navigation.getParam('reportId', 'NO-ID'));
+    }
+
+    setInputs = async () => {
+        const { title, imgSrc, desc } = this.state;
+        this.setState({
+            loading: true,
+        });
+        await this.db
+            .get()
+            .then(report => {
+                if (report.exists) {
+                    const data = report.data();
+                    this.setState({
+                        title: data.title,
+                        imgSrc: data.imgSrc,
+                        desc: data.desc,
+                        loading: false,
+                    });
+                } else {
+                    this.setState({
+                        loading: false,
+                    });
+                    Alert.alert('Error', 'Document not found!');
+                }
+            })
+            .catch(err => {
+                Alert.alert('Error', err);
+            });
     }
 
     getUser = async () => {
@@ -109,15 +139,12 @@ class AddNew extends React.Component {
             && imgSrc != null
             && desc != null) {
             let status = 'Queued';
-            await this.db.add({
+            await this.db.update({
                 title: title,
                 imgSrc: imgSrc,
-                desc: desc,
-                date: date,
-                status: status,
-                user: currentUser
+                desc: desc
             }).then(async post => {
-                await this.handleNotif('[INFO]: Report ['+title+'] telah ditambahkan oleh '+currentUser.fullName);
+                await this.handleNotif('[INFO]: Report ['+title+'] telah di perbaharui oleh '+currentUser.fullName);
                 await this.setState({
                     loading: false,
                     title: null,
@@ -141,6 +168,13 @@ class AddNew extends React.Component {
 
     componentDidMount() {
         this.getUser();
+        this.focusListener = this.props.navigation.addListener('didFocus', () => {
+            this.setInputs();
+        });
+    }
+
+    componentWillUnmount() {
+        this.focusListener.remove();
     }
 
     render() {
@@ -176,7 +210,7 @@ class AddNew extends React.Component {
                         rippleColor="white"
                         style={styles.btnRipple}
                         onPress={this.handleOnSubmit}>
-                            <Text style={{color: 'white', alignSelf: 'center'}}>Save Report!</Text>
+                            <Text style={{color: 'white', alignSelf: 'center'}}>Save Change</Text>
                         </Ripple>
                     </View>
                 </ScrollView>
@@ -216,4 +250,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default AddNew;
+export default EditReports;

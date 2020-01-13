@@ -6,11 +6,14 @@ import {
 } from 'react-native';
 import { DefaultTheme, Text, Provider as PaperProvider } from 'react-native-paper';
 import Routes from './src/screens/routes';
+import OneSignal from 'react-native-onesignal';
+
 
 class App extends React.Component {
 
   constructor(props){
     super(props);
+    OneSignal.init("c4c46357-ea12-41f9-bf10-0cdce1f3cdad");
   }
 
   render(){
