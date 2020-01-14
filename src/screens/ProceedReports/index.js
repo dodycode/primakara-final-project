@@ -137,6 +137,9 @@ class ProceedReports extends React.Component {
             })
             .then(async report => {
                 await this.getProceedReports();
+                this.setState({
+                    staffNotes: null
+                });
             })
             .catch(err => {
                 this.setState({
