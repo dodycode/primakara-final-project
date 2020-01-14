@@ -74,7 +74,7 @@ class MyReports extends React.Component {
                     const list = [];
 
                     reports.forEach(async report => {
-                        const {title, desc, imgSrc, date, status, staff, staffNote} = report.data();
+                        const {title, desc, imgSrc, date, status, user, staff, staffNote} = report.data();
                         await list.push({
                             id: report.id,
                             title: title,
@@ -82,6 +82,7 @@ class MyReports extends React.Component {
                             imgSrc: imgSrc,
                             date: date,
                             status: status,
+                            user: user,
                             staff: staff,
                             staffNote: staffNote
                         });
@@ -143,6 +144,7 @@ class MyReports extends React.Component {
                                                     style={style.imgDidalem} />
                                                 <Paragraph>
                                                     {
+                                                        'Pelapor: \n' + data.user.fullName + '\n' +
                                                         'Description: \n' + data.desc + '\n' +
                                                         'Status: \n' + data.status + '\n' +
                                                         'Handled by: \n'+ handledBy + '\n' +

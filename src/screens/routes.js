@@ -89,6 +89,12 @@ const DrawerNavigator = createDrawerNavigator({
 			title: 'My Reports'
 		}
 	},
+	Primers: {
+		screen: StaffList,
+		navigationOptions: {
+			title: 'Primers'
+		}
+	},
 	Logout: {
 		screen: Logout,
 		navigationOptions: {
