@@ -115,7 +115,9 @@ class AddNew extends React.Component {
                 desc: desc,
                 date: date,
                 status: status,
-                user: currentUser
+                user: currentUser,
+                staff: null,
+                staffNote: null
             }).then(async post => {
                 await this.handleNotif('[INFO]: Report ['+title+'] telah ditambahkan oleh '+currentUser.fullName);
                 await this.setState({

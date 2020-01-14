@@ -12,6 +12,7 @@ import ClosedReports from './ClosedReports';
 import ProceedReports from './ProceedReports';
 import AddNew from './AddNew';
 import EditReports from './EditReports';
+import MyReports from './MyReports';
 import StaffList from './StaffList';
 import About from './About';
 import Login from './Authentication/Login';
@@ -80,6 +81,12 @@ const DrawerNavigator = createDrawerNavigator({
 		screen: AppNavigator,
 		navigationOptions: {
 			title: 'Home'
+		}
+	},
+	MyReports: {
+		screen: MyReports,
+		navigationOptions: {
+			title: 'My Reports'
 		}
 	},
 	Logout: {

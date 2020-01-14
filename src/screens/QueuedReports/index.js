@@ -299,31 +299,32 @@ class QueuedReports extends React.Component {
                                                                 )} />
                                                             </React.Fragment>
                                                         ) :
-                                                        (
-                                                            <React.Fragment>
-                                                                <Menu.Item 
-                                                                title="Edit" 
-                                                                onPress={async () => {
-                                                                    await this.setState({
-                                                                        showMenu: false
-                                                                    });
-                                                                    this.props
-                                                                    .navigation
-                                                                    .navigate(
-                                                                        'EditReports', 
-                                                                        {
-                                                                            reportId: data.id,
-                                                                        }
-                                                                    );
-                                                                }} />
-                                                                <Menu.Item 
-                                                                title="Delete"
-                                                                onPress={() => this.confirmAlert(
-                                                                    'Yakin ingin menghapus laporan ini??',
-                                                                    2,
-                                                                    data.id
-                                                                )} />
-                                                            </React.Fragment>
+                                                        ( data.user.uid === this.state.currentUser.uid ? (
+                                                                <React.Fragment>
+                                                                    <Menu.Item 
+                                                                    title="Edit" 
+                                                                    onPress={async () => {
+                                                                        await this.setState({
+                                                                            showMenu: false
+                                                                        });
+                                                                        this.props
+                                                                        .navigation
+                                                                        .navigate(
+                                                                            'EditReports', 
+                                                                            {
+                                                                                reportId: data.id,
+                                                                            }
+                                                                        );
+                                                                    }} />
+                                                                    <Menu.Item 
+                                                                    title="Delete"
+                                                                    onPress={() => this.confirmAlert(
+                                                                        'Yakin ingin menghapus laporan ini??',
+                                                                        2,
+                                                                        data.id
+                                                                    )} />
+                                                                </React.Fragment>
+                                                            ) : null
                                                         )
                                                     ) : null
                                                 } 
