@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu } from 'react-native-paper';
+import axios from 'axios';
+import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu, Dialog, Portal, TextInput } from 'react-native-paper';
 import { ScrollView, StyleSheet, View, Image, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -15,7 +16,9 @@ class ProceedReports extends React.Component {
             loading: false,
             showMenu: false,
             currentSelectedId: null,
-            currentUser: null
+            currentUser: null,
+            showModal: false,
+            staffNotes: null
         }
 
         this.getUser();
@@ -64,6 +67,32 @@ class ProceedReports extends React.Component {
         });
     }
 
+    toggleDialog = () => {
+        this.setState({
+            showModal: !this.state.showModal
+        })
+    }
+
+    handleChangeInput = field => text => {
+        this.setState({
+            [field]: text
+        });
+    };
+
+    handleNotif = async msg => {
+        axios.defaults.headers.common['Authorization'] = 'Basic MTdmZTdjYWQtMWZjYi00ZjVjLTk0MDUtYzE3ZDVlNGMwNDM5';
+        axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+        await axios({
+            method: 'POST',
+            url: 'https://onesignal.com/api/v1/notifications',
+            data: {
+                app_id: 'c4c46357-ea12-41f9-bf10-0cdce1f3cdad',
+                contents: {"en" : msg},
+                included_segments: ['All']
+            }
+        }).catch(err => console.error(err));
+    }
+
     confirmAlert = async (msg, id) => {
         await this.setState({
             currentSelectedId: id
@@ -78,8 +107,9 @@ class ProceedReports extends React.Component {
             },
             {
                 text: 'OK', 
-                onPress: () => {
-                    this.closeReports()
+                onPress: async () => {
+                    await this.hideMenu();
+                    this.toggleDialog();
                 }
             },
           ],
@@ -92,11 +122,18 @@ class ProceedReports extends React.Component {
             this.setState({
                 loading: true
             });
+            const { proceedReports, currentSelectedId, currentUser, staffNotes } = this.state;
+            let rejectedReport = await proceedReports.find(report => {
+                return report.id == currentSelectedId;
+            });
+            await this.handleNotif('[INFO]: Report ['+rejectedReport.title+'] telah di tuntaskan oleh '+currentUser.fullName);
             await firestore()
             .collection('reports')
-            .doc(this.state.currentSelectedId)
+            .doc(currentSelectedId)
             .update({
-                status: 'Closed'
+                status: 'Closed',
+                staff: currentUser.fullName,
+                staffNote: staffNotes
             })
             .then(async report => {
                 await this.getProceedReports();
@@ -210,7 +247,7 @@ class ProceedReports extends React.Component {
                                             <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: 'https://source.unsplash.com/50x50/?people' }} />
                                             <View style={{flex: 1}}>
                                                 <Text>{data.title}</Text>
-                                                <Caption>{data.user} - {data.date}</Caption>
+                                                <Caption>{data.user.fullName} - {data.date}</Caption>
                                             </View>
                                             {
                                                 this.state.currentUser != null ? 
@@ -251,9 +288,40 @@ class ProceedReports extends React.Component {
                         })
                     ) : <Caption style={{alignSelf: 'center', marginTop: 14}}>Tidak ada laporan sedang diproses.</Caption>}
                 </ScrollView>
+                <Portal>
+                    <Dialog
+                        visible={this.state.showModal}
+                        onDismiss={this.toggleDialog}>
+                        <Dialog.Title>Closed Report</Dialog.Title>
+                        <Dialog.Content>
+                            <Caption>Reason</Caption>
+                            <TextInput 
+                            mode="outlined" 
+                            style={{backgroundColor: "white", fontSize: 12}} 
+                            theme={textInputConfig} 
+                            multiline={true}
+                            onChangeText={this.handleChangeInput('staffNotes')}
+                            value={this.state.staffNotes} 
+                            placeholder="Type something..."/>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={async () => {
+                                await this.toggleDialog();
+                                this.closeReports();
+                            }}>Done</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
             </React.Fragment>
         );
     }
+}
+
+const textInputConfig = {
+    colors: {
+        primary: '#1976d2'
+    },
+    roundness: 2
 }
 
 const styles = StyleSheet.create({

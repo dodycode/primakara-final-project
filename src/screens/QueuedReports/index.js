@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu } from 'react-native-paper';
+import { Button, Card, Title, Paragraph, Text, Subheading, Caption, Avatar, Divider, TouchableRipple, Menu, Dialog, Portal, TextInput } from 'react-native-paper';
 import { ScrollView, StyleSheet, View, Image, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -17,7 +17,9 @@ class QueuedReports extends React.Component {
             showMenu: false,
             currentSelectedId: null,
             currentSelectedAction: null,
-            currentUser: null
+            currentUser: null,
+            showModal: false,
+            staffNotes: null
         }
     }
 
@@ -79,6 +81,18 @@ class QueuedReports extends React.Component {
         });
     }
 
+    toggleDialog = () => {
+        this.setState({
+            showModal: !this.state.showModal
+        })
+    }
+
+    handleChangeInput = field => text => {
+        this.setState({
+            [field]: text
+        });
+    };
+
     confirmAlert = async (msg, func, id) => {
         await this.setState({
             currentSelectedId: id,
@@ -94,6 +108,7 @@ class QueuedReports extends React.Component {
                 {
                     text: 'OK',
                     onPress: async () => {
+                        await this.hideMenu();
                         const { reports, currentSelectedId, currentUser } = this.state;
                         let selectedReport = await reports.find(report => {
                             return report.id == currentSelectedId;
@@ -104,8 +119,11 @@ class QueuedReports extends React.Component {
                                 this.setProceedReports()
                                 break;
                             case 2:
+                                await this.toggleDialog()
+                                break;
+                            case 3:
                                 await this.handleNotif('[INFO]: Report ['+selectedReport.title+'] telah di hapus oleh '+currentUser.fullName);
-                                this.rejectReports()
+                                this.deleteReports()
                                 break;
                         }
                     }
@@ -123,7 +141,8 @@ class QueuedReports extends React.Component {
                 .collection('reports')
                 .doc(this.state.currentSelectedId)
                 .update({
-                    status: 'Proceed'
+                    status: 'Proceed',
+                    staff: this.state.currentUser.fullName
                 })
                 .then(async () => {
                     this.getReports();
@@ -137,7 +156,38 @@ class QueuedReports extends React.Component {
         }
     }
 
-    rejectReports = async () => {
+    setRejectReports = async () => {
+        if (this.state.currentSelectedId != null) {
+            this.setState({
+                loading: true
+            });
+            const { reports, currentSelectedId, currentUser, staffNotes } = this.state;
+            let rejectedReport = await reports.find(report => {
+                return report.id == currentSelectedId;
+            });
+            await this.handleNotif('[INFO]: Report ['+rejectedReport.title+'] telah di reject oleh '+currentUser.fullName);
+            await firestore()
+                .collection('reports')
+                .doc(currentSelectedId)
+                .update({
+                    status: 'Reject',
+                    staff: currentUser.fullName,
+                    staffNote: staffNotes
+                })
+                .then(async () => {
+                    this.getReports();
+                })
+                .catch(err => {
+                    this.setState({
+                        loading: false,
+                        staffNotes: null
+                    });
+                    Alert.alert('Error', err);
+                });
+        }
+    }
+
+    deleteReports = async () => {
         if (this.state.currentSelectedId != null) {
             this.setState({
                 loading: true
@@ -320,7 +370,7 @@ class QueuedReports extends React.Component {
                                                                     title="Delete"
                                                                     onPress={() => this.confirmAlert(
                                                                         'Yakin ingin menghapus laporan ini??',
-                                                                        2,
+                                                                        3,
                                                                         data.id
                                                                     )} />
                                                                 </React.Fragment>
@@ -337,9 +387,40 @@ class QueuedReports extends React.Component {
                         })
                     ) : <Caption style={{alignSelf: 'center', marginTop: 14}}>Tidak ada laporan.</Caption>}
                 </ScrollView>
+                <Portal>
+                    <Dialog
+                        visible={this.state.showModal}
+                        onDismiss={this.toggleDialog}>
+                        <Dialog.Title>Reject Report</Dialog.Title>
+                        <Dialog.Content>
+                            <Caption>Reason</Caption>
+                            <TextInput 
+                            mode="outlined" 
+                            style={{backgroundColor: "white", fontSize: 12}} 
+                            theme={textInputConfig} 
+                            multiline={true}
+                            onChangeText={this.handleChangeInput('staffNotes')}
+                            value={this.state.staffNotes} 
+                            placeholder="Type something..."/>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={async () => {
+                                await this.toggleDialog();
+                                this.setRejectReports();
+                            }}>Done</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
             </React.Fragment>
         );
     }
+}
+
+const textInputConfig = {
+    colors: {
+        primary: '#1976d2'
+    },
+    roundness: 2
 }
 
 const styles = StyleSheet.create({

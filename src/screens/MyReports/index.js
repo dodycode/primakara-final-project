@@ -56,9 +56,17 @@ class MyReports extends React.Component {
 
     getReports = async () => {
         const { currentUser } = this.state;
-        await firestore()
-        .collection('reports')
-        .where('user.uid', '==', currentUser.uid)
+        let db = null;
+        if (!currentUser.isStaff) {
+            db = firestore()
+            .collection('reports')
+            .where('user.uid', '==', currentUser.uid);
+        }else{
+            db = firestore()
+            .collection('reports')
+            .where('staff', '==', currentUser.fullName);
+        }
+        await db
         .onSnapshot({
             error: e => Alert.alert('Error', e),
             next: reports => {
